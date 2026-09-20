@@ -24,7 +24,7 @@ flowchart LR
 uv run scraper.py
 
 cat filter_prompt.txt ads.txt > prompt.txt
-curl -sS https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent \
+curl -sS https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent \
   -H "x-goog-api-key: $GEMINI_API_KEY" \
   -H "Content-Type: application/json" \
   -d "$(jq -n --rawfile p prompt.txt '{contents:[{parts:[{text:$p}]}]}')" \
