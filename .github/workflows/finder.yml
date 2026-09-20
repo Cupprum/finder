@@ -20,7 +20,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          cat filter_prompt.txt ads.txt > prompt.txt
+          cat filter_prompt.txt ads.txt | tee prompt.txt
           jq -n --rawfile p prompt.txt \
             '{contents:[{parts:[{text:$p}]}]}' > request.json
           curl -sS https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent \
