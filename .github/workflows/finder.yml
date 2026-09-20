@@ -1,0 +1,40 @@
+name: finder
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Scrape dba.dk
+        run: uv run scraper.py > ads.txt
+
+      - name: Filter with DeepSeek
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          cat filter_prompt.txt ads.txt > prompt.txt
+          jq -n --rawfile p prompt.txt \
+            '{model:"deepseek-chat",messages:[{role:"user",content:$p}]}' > request.json
+          curl -sS https://api.deepseek.com/chat/completions \
+            -H "Authorization: Bearer $DEEPSEEK_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d @request.json \
+            | jq -r '.choices[0].message.content // .error.message' > result.txt
+
+      - name: Send mail
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: uv run mail.py < result.txt

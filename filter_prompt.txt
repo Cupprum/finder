@@ -1,0 +1,1 @@
+Given these dba.dk ads, list only spinnaker poles (Danish: "spilerstage") suitable for a Hallberg Rassy 29 sailboat: length about 3.0-4.0 m. Put ones under 2000 DKK first. For each: title, price, url. Reject boats, masts, sails, rigs.
