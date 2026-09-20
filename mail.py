@@ -20,7 +20,7 @@ def send(subject: str, body: str) -> None:
     message["To"] = os.environ["MAIL_TO"]
     message.set_content(body)
     host = os.environ["SMTP_HOST"]
-    port = int(os.environ.get("SMTP_PORT", "587"))
+    port = int(os.environ["SMTP_PORT"])
     with smtplib.SMTP(host, port) as smtp:
         smtp.starttls()
         smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_PASSWORD"])
