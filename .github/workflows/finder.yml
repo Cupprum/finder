@@ -2,7 +2,7 @@ name: finder
 
 on:
   schedule:
-    - cron: "0 7 * * *"
+    - cron: "0 7 * * 6"
   workflow_dispatch:
 
 jobs:
@@ -16,18 +16,18 @@ jobs:
       - name: Scrape dba.dk
         run: uv run scraper.py > ads.txt
 
-      - name: Filter with DeepSeek
+      - name: Filter with Gemini
         env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           cat filter_prompt.txt ads.txt > prompt.txt
           jq -n --rawfile p prompt.txt \
-            '{model:"deepseek-chat",messages:[{role:"user",content:$p}]}' > request.json
-          curl -sS https://api.deepseek.com/chat/completions \
-            -H "Authorization: Bearer $DEEPSEEK_API_KEY" \
+            '{contents:[{parts:[{text:$p}]}]}' > request.json
+          curl -sS https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent \
+            -H "x-goog-api-key: $GEMINI_API_KEY" \
             -H "Content-Type: application/json" \
             -d @request.json \
-            | jq -r '.choices[0].message.content // .error.message' > result.txt
+            | jq -r '.candidates[0].content.parts[0].text // .error.message' > result.txt
 
       - name: Send mail
         env:
