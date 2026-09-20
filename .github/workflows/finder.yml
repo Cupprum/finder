@@ -23,7 +23,7 @@ jobs:
           cat filter_prompt.txt ads.txt | tee prompt.txt
           jq -n --rawfile p prompt.txt \
             '{contents:[{parts:[{text:$p}]}]}' > request.json
-          curl -sS https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent \
+          curl -sS https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent \
             -H "x-goog-api-key: $GEMINI_API_KEY" \
             -H "Content-Type: application/json" \
             -d @request.json \
